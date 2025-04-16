@@ -1,20 +1,25 @@
-import { Day, DayCondition } from "../types/day";
-import { WeatherDay } from "./weatherApi";
+import { DayInfo, DayCondition, WeatherDay } from "../types/day";
 
-function determineWeatherCondition(highTemp: number, rainChance: number) {
-  if (highTemp > 68 && rainChance < 10) {
+export function determineWeatherCondition(
+  tempHigh: number,
+  precipitationChance: number
+) {
+  if (tempHigh > 90) {
+    return DayCondition.Poor;
+  }
+  if (tempHigh > 68 && precipitationChance < 10) {
     return DayCondition.Ideal;
   }
-  if (highTemp > 60 && rainChance < 30) {
+  if (tempHigh > 60 && precipitationChance < 30) {
     return DayCondition.Fair;
   }
   return DayCondition.Poor;
 }
 
 export function formatWeather(weather: WeatherDay[]) {
-  const days: Day[] = weather.map((day) => ({
+  const days: DayInfo[] = weather.map((day) => ({
     ...day,
-    niceness: determineWeatherCondition(day.highTemp, day.rainChance),
+    niceness: determineWeatherCondition(day.tempHigh, day.precipitationChance),
   }));
 
   return days;

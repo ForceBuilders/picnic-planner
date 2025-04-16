@@ -4,9 +4,27 @@ export enum DayCondition {
   Poor,
 }
 
-export interface Day {
+export interface DayInfo {
   dayDate: Date;
-  highTemp: number;
-  rainChance: number;
+  tempHigh: number;
+  tempLow: number;
+  precipitationChance: number;
+  precipitationSum: number;
+  windSpeedMax: number;
+  windSpeedGusts: number;
+  windDirection: number;
+  humidityMean: number;
   niceness: DayCondition;
+}
+
+export interface WeatherDay {
+  dayDate: Date;
+  tempHigh: number;
+  tempLow: number;
+  precipitationChance: number;
+  precipitationSum: number;
+  windSpeedMax: number;
+  windSpeedGusts: number;
+  windDirection: number;
+  humidityMean: number;
 }
