@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { DayInfo, HistoricalWeatherDay } from "../types/day";
+import { useQuery } from "@tanstack/react-query";
+import { DayInfo } from "../types/day";
 import { getHistoricalWeather } from "../lib/weatherApi";
+import HistoryTable from "./HistoryTable";
 
 interface ModalProps {
   dayName: string;
@@ -20,38 +21,24 @@ function degreesToCardinal(degrees: number) {
 function DayDetail(props: ModalProps) {
   const day = props.dayInfo;
 
-  const [data, setData] = useState<HistoricalWeatherDay[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const fetchData = async () => {
+    console.log(props.dayInfo.dayDate);
+    const response = await getHistoricalWeather(props.dayInfo.dayDate);
+    return response;
+  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getHistoricalWeather(props.dayInfo.dayDate);
-        setData(response);
-      } catch (e: unknown) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["history"],
+    queryFn: fetchData,
+    enabled: !!props.isOpen,
+  });
 
-    fetchData();
-  }, []);
+  if (isLoading) return "Loading...";
+  if (isError) return `An error has occurred: ${error.message}`;
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  console.log(data);
-
-  return (
-    <div className="relative">
-      {props.isOpen && (
+  if (props.isOpen) {
+    return (
+      <div className="relative">
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full relative">
             <div className="grid grid-cols-2 gap-2 p-4 bg-gray-100 rounded-xl shadow">
@@ -86,38 +73,14 @@ function DayDetail(props: ModalProps) {
                 <span>Humidity {day.humidityMean}%</span>
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded-xl shadow">
-              <div className={`flex flex-col items-center border`}>
-                <span className="font-bold">Year</span>
-              </div>
-              <div className={`flex flex-col items-center border`}>
-                <span className="font-bold">High</span>
-              </div>
-              <div className={`flex flex-col items-center border`}>
-                <span className="font-bold">Low</span>
-              </div>
-              <div className={`flex flex-col items-center border`}>
-                <span className="font-bold">Precip</span>
-              </div>
-              {/* Details below */}
-              <div className={`flex flex-col items-center border`}>
-                {data[0].dayDate.getFullYear()}
-              </div>
-              <div className={`flex flex-col items-center border`}>
-                {data[0].tempHigh}
-              </div>
-              <div className={`flex flex-col items-center border`}>
-                {data[0].tempLow}
-              </div>
-              <div className={`flex flex-col items-center border`}>
-                {data[0].precipitationSum}
-              </div>
-            </div>
+            <HistoryTable history={data}></HistoryTable>
           </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  return <div />;
 }
 
 export default DayDetail;
