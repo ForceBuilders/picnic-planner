@@ -1,4 +1,6 @@
-import { DayInfo } from "../types/day";
+import { useState, useEffect } from "react";
+import { DayInfo, HistoricalWeatherDay } from "../types/day";
+import { getHistoricalWeather } from "../lib/weatherApi";
 
 interface ModalProps {
   dayName: string;
@@ -17,6 +19,36 @@ function degreesToCardinal(degrees: number) {
 
 function DayDetail(props: ModalProps) {
   const day = props.dayInfo;
+
+  const [data, setData] = useState<HistoricalWeatherDay[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getHistoricalWeather(props.dayInfo.dayDate);
+        setData(response);
+      } catch (e: unknown) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  console.log(data);
+
   return (
     <div className="relative">
       {props.isOpen && (
@@ -52,6 +84,33 @@ function DayDetail(props: ModalProps) {
                 className={`flex flex-col items-center p-2 rounded-xl border`}
               >
                 <span>Humidity {day.humidityMean}%</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded-xl shadow">
+              <div className={`flex flex-col items-center border`}>
+                <span className="font-bold">Year</span>
+              </div>
+              <div className={`flex flex-col items-center border`}>
+                <span className="font-bold">High</span>
+              </div>
+              <div className={`flex flex-col items-center border`}>
+                <span className="font-bold">Low</span>
+              </div>
+              <div className={`flex flex-col items-center border`}>
+                <span className="font-bold">Precip</span>
+              </div>
+              {/* Details below */}
+              <div className={`flex flex-col items-center border`}>
+                {data[0].dayDate.getFullYear()}
+              </div>
+              <div className={`flex flex-col items-center border`}>
+                {data[0].tempHigh}
+              </div>
+              <div className={`flex flex-col items-center border`}>
+                {data[0].tempLow}
+              </div>
+              <div className={`flex flex-col items-center border`}>
+                {data[0].precipitationSum}
               </div>
             </div>
           </div>

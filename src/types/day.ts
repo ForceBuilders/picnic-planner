@@ -28,3 +28,10 @@ export interface WeatherDay {
   windDirection: number;
   humidityMean: number;
 }
+
+export interface HistoricalWeatherDay {
+  dayDate: Date;
+  tempHigh: number;
+  tempLow: number;
+  precipitationSum: number;
+}

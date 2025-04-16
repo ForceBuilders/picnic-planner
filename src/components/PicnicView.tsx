@@ -13,10 +13,6 @@ function PicnicView() {
     const fetchData = async () => {
       try {
         const response = await getCurrentWeather();
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! status: ${response.status}`);
-        // }
-        // const result: DataType[] = await response.json();
         setData(formatWeather(response));
       } catch (e: unknown) {
         setError(e.message);

@@ -1,11 +1,18 @@
 import { fetchWeatherApi } from "openmeteo";
-import { WeatherDay } from "../types/day";
+import { WeatherDay, HistoricalWeatherDay } from "../types/day";
+
+const commonParams = {
+  latitude: 40.622231,
+  longitude: -80.05928,
+  timezone: "America/New_York",
+  wind_speed_unit: "mph",
+  temperature_unit: "fahrenheit",
+  precipitation_unit: "inch",
+};
 
 export async function getCurrentWeather(): Promise<WeatherDay[]> {
   const params = {
-    latitude: 40.622231,
-    longitude: -80.05928,
-    // daily: ["temperature_2m_max", "precipitation_probability_max"],
+    ...commonParams,
     daily: [
       "temperature_2m_max",
       "temperature_2m_min",
@@ -22,11 +29,7 @@ export async function getCurrentWeather(): Promise<WeatherDay[]> {
       "relative_humidity_2m_min",
       "relative_humidity_2m_max",
     ],
-    timezone: "America/New_York",
     forecast_days: 14,
-    wind_speed_unit: "mph",
-    temperature_unit: "fahrenheit",
-    precipitation_unit: "inch",
   };
   const url = "https://api.open-meteo.com/v1/forecast";
   const responses = await fetchWeatherApi(url, params);
@@ -80,4 +83,77 @@ export async function getCurrentWeather(): Promise<WeatherDay[]> {
     });
   }
   return days;
+}
+
+function formatDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+async function getPastWeather(day: Date): Promise<HistoricalWeatherDay> {
+  const dayString = formatDate(day);
+  const params = {
+    ...commonParams,
+    start_date: dayString,
+    end_date: dayString,
+    daily: ["precipitation_sum", "temperature_2m_max", "temperature_2m_min"],
+  };
+  const url = "https://archive-api.open-meteo.com/v1/archive";
+  const responses = await fetchWeatherApi(url, params);
+
+  // Process first location. Add a for-loop for multiple locations or weather models
+  const response = responses[0];
+
+  // Attributes for timezone and location
+  const utcOffsetSeconds = response.utcOffsetSeconds();
+
+  const daily = response.daily()!;
+
+  // Note: The order of weather variables in the URL query and the indices below need to match!
+  const weatherData = {
+    daily: {
+      time: [
+        ...Array(
+          (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval()
+        ),
+      ].map(
+        (_, i) =>
+          new Date(
+            (Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) *
+              1000
+          )
+      ),
+      precipitationSum: daily.variables(0)?.valuesArray(),
+      temperature2mMax: daily.variables(1)?.valuesArray(),
+      temperature2mMin: daily.variables(2)?.valuesArray(),
+    },
+  };
+
+  // const days: HistoricalWeatherDay[] = [];
+  // for (let i = 0; i < weatherData.daily.time.length; i++) {
+  //   days.push({
+  //     dayDate: new Date(weatherData.daily.time[i]),
+  //     tempHigh: Math.round(weatherData.daily.temperature2mMax[i]),
+  //     tempLow: Math.round(weatherData.daily.temperature2mMin[i]),
+  //     precipitationSum: Math.round(weatherData.daily.precipitationSum[i]),
+  //   });
+  // }
+  // return days;
+  return {
+    dayDate: new Date(weatherData.daily.time[0]),
+    tempHigh: Math.round(weatherData.daily.temperature2mMax[0]),
+    tempLow: Math.round(weatherData.daily.temperature2mMin[0]),
+    precipitationSum: Math.round(weatherData.daily.precipitationSum[0]),
+  };
+}
+
+export async function getHistoricalWeather(
+  day: Date
+): Promise<HistoricalWeatherDay[]> {
+  const dateCounter = new Date(day);
+  // subtract a year
+  dateCounter.setFullYear(dateCounter.getFullYear() - 1);
+  return [await getPastWeather(dateCounter)];
 }
