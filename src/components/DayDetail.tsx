@@ -38,21 +38,19 @@ function DayDetail(props: ModalProps) {
   }
 
   if (isError) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   if (props.isOpen) {
     return (
       <div className="relative">
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full relative">
+          <div className="bg-white p-6 rounded-xl shadow-lg max-w-lg w-full relative">
             <div className="grid grid-cols-2 gap-2 p-4 bg-gray-100 rounded-xl shadow">
               <div
-                className={`flex col-span-2 items-center p-2 rounded-xl border`}
+                className={`flex flex-col col-span-2 items-center p-2 rounded-xl border font-bold`}
               >
-                <span className="font-bold">
-                  {props.dayName}, {props.dayValue}
-                </span>
+                {props.dayName}, {props.dayValue}
               </div>
               <div
                 className={`flex flex-col items-center p-2 rounded-xl border`}

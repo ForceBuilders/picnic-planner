@@ -143,8 +143,20 @@ async function getPastWeather(day: Date): Promise<HistoricalWeatherDay> {
 export async function getHistoricalWeather(
   day: Date
 ): Promise<HistoricalWeatherDay[]> {
+  const promises: Promise<HistoricalWeatherDay>[] = [];
   const dateCounter = new Date(day);
-  // subtract a year
-  dateCounter.setFullYear(dateCounter.getFullYear() - 1);
-  return [await getPastWeather(dateCounter)];
+
+  for (let i = 0; i < 10; i++) {
+    dateCounter.setFullYear(dateCounter.getFullYear() - 1);
+    const promise = getPastWeather(dateCounter);
+    promises.push(promise);
+  }
+
+  return await Promise.all(promises)
+    .then((results) => {
+      return results;
+    })
+    .catch((err: unknown) => {
+      throw err;
+    });
 }

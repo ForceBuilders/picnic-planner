@@ -5,8 +5,8 @@ import PicnicView from "../components/PicnicView";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // ✅ globally default to 5 minutes
-      staleTime: 1000 * 60 * 5,
+      // globally default to 1 hours
+      staleTime: 1000 * 60 * 60,
     },
   },
 });

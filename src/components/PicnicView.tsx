@@ -20,7 +20,7 @@ function PicnicView() {
   }
 
   if (isError) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   if (data) {

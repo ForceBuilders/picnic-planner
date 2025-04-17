@@ -17,6 +17,8 @@ function Day(day: DayInfo) {
     setIsOpen(!isOpen);
   }
 
+  // Known Issue: https://github.com/iamkun/dayjs/issues/1903
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const dayDate: Dayjs = dayjs(day.dayDate) as Dayjs;
   const dayName = dayDate.format("dddd");
   const dayValue = dayDate.format("MMM D");
