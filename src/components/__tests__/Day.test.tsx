@@ -1,10 +1,12 @@
-import { screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { describe, it, expect } from "vitest";
 import Day from "../Day";
 import { DayInfo, DayCondition } from "../../types/day";
-import { renderWithClient } from "./utils";
-import { describe, it, expect } from "vitest";
 
 describe("Day", () => {
+  const queryClient = new QueryClient();
+
   it("should render properly", () => {
     const dayInfo: DayInfo = {
       dayDate: new Date("2025-04-15T00:00:00-04:00"),
@@ -18,7 +20,11 @@ describe("Day", () => {
       windDirection: 45,
       humidityMean: 45,
     };
-    renderWithClient(<Day {...dayInfo} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Day {...dayInfo} />
+      </QueryClientProvider>
+    );
     expect(screen.getByText("Tuesday")).toBeDefined();
   });
 });

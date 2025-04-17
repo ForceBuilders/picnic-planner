@@ -31,12 +31,12 @@ function DayDetail(props: ModalProps) {
     enabled: !!props.isOpen,
   });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   if (isError) {
     return <div>Error: {error.message}</div>;
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   if (props.isOpen) {
