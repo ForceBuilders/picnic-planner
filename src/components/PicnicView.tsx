@@ -5,7 +5,6 @@ import { formatWeather } from "../lib/weatherFormat";
 
 function PicnicView() {
   const fetchData = async () => {
-    console.log("Fetching Main Data");
     const response = await getCurrentWeather();
     return response;
   };

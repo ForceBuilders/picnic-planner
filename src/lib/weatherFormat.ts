@@ -1,18 +1,33 @@
 import { DayInfo, DayCondition, WeatherDay } from "../types/day";
 
-export function determineWeatherCondition(
+const idealTempMax = 82;
+const idealTempMin = 68;
+const acceptableTempMax = 88;
+const acceptableTempMin = 60;
+const idealMaxPrecipitationChance = 10;
+const acceptableMaxPrecipitationChance = 30;
+
+function determineWeatherCondition(
   tempHigh: number,
   precipitationChance: number
 ) {
-  if (tempHigh > 90) {
-    return DayCondition.Poor;
-  }
-  if (tempHigh > 68 && precipitationChance < 10) {
+  // If we fall into the ideal conditions, then the day is Ideal
+  if (
+    tempHigh >= idealTempMin &&
+    tempHigh <= idealTempMax &&
+    precipitationChance <= idealMaxPrecipitationChance
+  ) {
     return DayCondition.Ideal;
   }
-  if (tempHigh > 60 && precipitationChance < 30) {
+  // If we can manage the acceptable conditions, then the day is Fair
+  if (
+    tempHigh >= acceptableTempMin &&
+    tempHigh <= acceptableTempMax &&
+    precipitationChance <= acceptableMaxPrecipitationChance
+  ) {
     return DayCondition.Fair;
   }
+  // Otherwise the day is Poor
   return DayCondition.Poor;
 }
 
@@ -24,3 +39,8 @@ export function formatWeather(weather: WeatherDay[]) {
 
   return days;
 }
+
+// Expose private functions for testing
+export const exportedForTesting = {
+  determineWeatherCondition,
+};

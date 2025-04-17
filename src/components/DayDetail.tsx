@@ -6,7 +6,6 @@ import HistoryTable from "./HistoryTable";
 interface ModalProps {
   dayName: string;
   dayValue: string;
-
   dayInfo: DayInfo;
   isOpen: boolean;
   onClose: () => void;
@@ -22,7 +21,6 @@ function DayDetail(props: ModalProps) {
   const day = props.dayInfo;
 
   const fetchData = async (dayDate: Date) => {
-    console.log(dayDate);
     const response = await getHistoricalWeather(dayDate);
     return response;
   };
@@ -48,30 +46,32 @@ function DayDetail(props: ModalProps) {
           <div className="bg-white p-6 rounded-xl shadow-lg max-w-lg w-full relative">
             <div className="grid grid-cols-2 gap-2 p-4 bg-gray-100 rounded-xl shadow">
               <div
-                className={`flex flex-col col-span-2 items-center p-2 rounded-xl border font-bold`}
+                className={
+                  "flex flex-col col-span-2 items-center p-2 rounded-xl border font-bold"
+                }
               >
                 {props.dayName}, {props.dayValue}
               </div>
               <div
-                className={`flex flex-col items-center p-2 rounded-xl border`}
+                className={"flex flex-col items-center p-2 rounded-xl border"}
               >
                 <span>High {day.tempHigh}°</span>
                 <span>Low {day.tempLow}°</span>
               </div>
               <div
-                className={`flex flex-col items-center p-2 rounded-xl border`}
+                className={"flex flex-col items-center p-2 rounded-xl border"}
               >
                 <span>Rain {day.precipitationChance}%</span>
                 <span>{day.precipitationSum} Inches</span>
               </div>
               <div
-                className={`flex flex-col items-center p-2 rounded-xl border`}
+                className={"flex flex-col items-center p-2 rounded-xl border"}
               >
                 <span>Wind {day.windSpeedMax} MPH</span>
                 <span>From {degreesToCardinal(day.windDirection)}</span>
               </div>
               <div
-                className={`flex flex-col items-center p-2 rounded-xl border`}
+                className={"flex flex-col items-center p-2 rounded-xl border"}
               >
                 <span>Humidity {day.humidityMean}%</span>
               </div>

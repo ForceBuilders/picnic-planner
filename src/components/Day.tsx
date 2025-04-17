@@ -13,7 +13,6 @@ function Day(day: DayInfo) {
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleModal() {
-    console.log("isOpen=", isOpen);
     setIsOpen(!isOpen);
   }
 
