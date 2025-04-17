@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { fetchWeatherApi } from "openmeteo";
 import { WeatherDay, HistoricalWeatherDay } from "../types/day";
 
@@ -86,7 +87,7 @@ export async function getCurrentWeather(): Promise<WeatherDay[]> {
 }
 
 function formatDate(date: Date) {
-  const year = date.getFullYear();
+  const year = String(date.getFullYear());
   const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
@@ -131,16 +132,6 @@ async function getPastWeather(day: Date): Promise<HistoricalWeatherDay> {
     },
   };
 
-  // const days: HistoricalWeatherDay[] = [];
-  // for (let i = 0; i < weatherData.daily.time.length; i++) {
-  //   days.push({
-  //     dayDate: new Date(weatherData.daily.time[i]),
-  //     tempHigh: Math.round(weatherData.daily.temperature2mMax[i]),
-  //     tempLow: Math.round(weatherData.daily.temperature2mMin[i]),
-  //     precipitationSum: Math.round(weatherData.daily.precipitationSum[i]),
-  //   });
-  // }
-  // return days;
   return {
     dayDate: new Date(weatherData.daily.time[0]),
     tempHigh: Math.round(weatherData.daily.temperature2mMax[0]),

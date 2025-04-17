@@ -21,20 +21,25 @@ function degreesToCardinal(degrees: number) {
 function DayDetail(props: ModalProps) {
   const day = props.dayInfo;
 
-  const fetchData = async () => {
-    console.log(props.dayInfo.dayDate);
-    const response = await getHistoricalWeather(props.dayInfo.dayDate);
+  const fetchData = async (dayDate: Date) => {
+    console.log(dayDate);
+    const response = await getHistoricalWeather(dayDate);
     return response;
   };
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["history"],
-    queryFn: fetchData,
+    queryKey: ["history", props.dayInfo.dayDate],
+    queryFn: () => fetchData(props.dayInfo.dayDate),
     enabled: !!props.isOpen,
   });
 
-  if (isLoading) return "Loading...";
-  if (isError) return `An error has occurred: ${error.message}`;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error: {error}</div>;
+  }
 
   if (props.isOpen) {
     return (

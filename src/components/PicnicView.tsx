@@ -1,44 +1,41 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Week from "../components/Week";
-import { DayInfo } from "../types/day";
 import { getCurrentWeather } from "../lib/weatherApi";
 import { formatWeather } from "../lib/weatherFormat";
 
 function PicnicView() {
-  const [data, setData] = useState<DayInfo[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const fetchData = async () => {
+    console.log("Fetching Main Data");
+    const response = await getCurrentWeather();
+    return response;
+  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getCurrentWeather();
-        setData(formatWeather(response));
-      } catch (e: unknown) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["picnic"],
+    queryFn: fetchData,
+  });
 
-    fetchData();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (isError) {
     return <div>Error: {error}</div>;
   }
 
-  return (
-    <>
-      <h1>Picnic Planner</h1>
-      <Week days={data.slice(0, 7)} />
-      <Week days={data.slice(7, 14)} />
-    </>
-  );
+  if (data) {
+    const formattedWeather = formatWeather(data);
+
+    return (
+      <>
+        <h1>Picnic Planner</h1>
+        <Week days={formattedWeather.slice(0, 7)} />
+        <Week days={formattedWeather.slice(7, 14)} />
+      </>
+    );
+  }
+
+  return <div>No data found</div>;
 }
 
 export default PicnicView;
